@@ -73,6 +73,24 @@ export function move (state: GameState): MoveResponse {
 		possibleMoves.up = false;
 	}
 
+	const { height, width } = state.board;
+
+	if (head.x === 0) {
+		possibleMoves.left = false;
+	}
+
+	if (head.y === 0) {
+		possibleMoves.down = false;
+	}
+
+	if (head.x === width - 1) {
+		possibleMoves.right = false;
+	}
+
+	if (head.y === height - 1) {
+		possibleMoves.up = false;
+	}
+
 	const validMoves = (Object.keys(possibleMoves) as Move[]).filter(move => possibleMoves[move]);
 	return {
 		move: validMoves[Math.floor(Math.random() * validMoves.length)]
