@@ -46,15 +46,35 @@ export function end (state: GameState): void {
 export function move (state: GameState): MoveResponse {
 	/**
 	 * Pick a random move, because that's fun! The next steps to take are:
-	 * 
+	 *
 	 * 1. Don't move back onto our neck
 	 * 2. Make sure we're not going to go outside the walls
 	 * 3. Don't hit any of our body parts
 	 * 4. Hungry? Best find food
 	 */
 
-	const possibleMoves: Move[] = [ 'up', 'right', 'down', 'left' ];
+	const possibleMoves: Record<Move, boolean> = {
+		up: true,
+		right: true,
+		down: true,
+		left: true
+	};
+
+	const { head, body } = state.you;
+	const neck = body[0];
+
+	if (neck.x < head.x) {
+		possibleMoves.left = false;
+	} else if (neck.x > head.x) {
+		possibleMoves.right = false;
+	} else if (neck.y < head.y) {
+		possibleMoves.down = false;
+	} else if (neck.y > head.y) {
+		possibleMoves.up = false;
+	}
+
+	const validMoves = (Object.keys(possibleMoves) as Move[]).filter(move => possibleMoves[move]);
 	return {
-		move: possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
+		move: validMoves[Math.floor(Math.random() * validMoves.length)]
 	};
 }
