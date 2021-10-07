@@ -1,3 +1,4 @@
+import { avoidSnake } from './logic';
 import { GameState, InfoResponse, Move, MoveResponse } from './types';
 
 /**
@@ -53,46 +54,56 @@ export function move (state: GameState): MoveResponse {
 	 * 4. Hungry? Best find food
 	 */
 
-	const possibleMoves: Record<Move, boolean> = {
+	let possibleMoves: Record<Move, boolean> = {
 		up: true,
 		right: true,
 		down: true,
 		left: true
 	};
 
-	const { head, body } = state.you;
+	const { head: { x: headX, y: headY}, body } = state.you;
 	const neck = body[0];
 
-	if (neck.x < head.x) {
+	if (neck.x < headX) {
 		possibleMoves.left = false;
-	} else if (neck.x > head.x) {
+	} else if (neck.x > headX) {
 		possibleMoves.right = false;
-	} else if (neck.y < head.y) {
+	} else if (neck.y < headY) {
 		possibleMoves.down = false;
-	} else if (neck.y > head.y) {
+	} else if (neck.y > headY) {
 		possibleMoves.up = false;
 	}
 
 	const { height, width } = state.board;
 
-	if (head.x === 0) {
+	if (headX === 0) {
 		possibleMoves.left = false;
 	}
 
-	if (head.y === 0) {
+	if (headY === 0) {
 		possibleMoves.down = false;
 	}
 
-	if (head.x === width - 1) {
+	if (headX === width - 1) {
 		possibleMoves.right = false;
 	}
 
-	if (head.y === height - 1) {
+	if (headY === height - 1) {
 		possibleMoves.up = false;
 	}
 
+	possibleMoves = avoidSnake(possibleMoves, { x: headX, y: headY }, body);
+
+	for (const snake of state.board.snakes) {
+		possibleMoves = avoidSnake(possibleMoves, { x: headX, y: headY }, snake.body);
+	}
+
 	const validMoves = (Object.keys(possibleMoves) as Move[]).filter(move => possibleMoves[move]);
-	return {
+	const response: MoveResponse = {
 		move: validMoves[Math.floor(Math.random() * validMoves.length)]
 	};
+
+	console.log(`${state.game.id} move is ${state.turn}: ${response.move}`);
+
+	return response;
 }
