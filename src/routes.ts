@@ -1,4 +1,4 @@
-import { GameState, InfoResponse, Move, MoveResponse } from "./types";
+import { GameState, InfoResponse, Move, MoveResponse } from './types';
 
 /**
  * Returns the snakes information
@@ -32,7 +32,7 @@ export function start (state: GameState): void {
  * @export
  * @param {GameState} state
  */
- export function end (state: GameState): void {
+export function end (state: GameState): void {
 	console.log(`Stopping ${state.game.id}`);
 }
 
